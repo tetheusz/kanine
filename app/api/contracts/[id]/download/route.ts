@@ -10,11 +10,32 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const token = await getToken({
+        const isProduction = process.env.NODE_ENV === 'production';
+        console.log('[DOWNLOAD_DEBUG] Init', {
+            id: (await params).id,
+            isProduction,
+            hasSecret: !!process.env.AUTH_SECRET
+        });
+
+        let token = await getToken({
             req: request,
             secret: process.env.AUTH_SECRET,
-            secureCookie: process.env.NODE_ENV === 'production'
+            secureCookie: isProduction
         });
+
+        console.log('[DOWNLOAD_DEBUG] Token result:', { hasToken: !!token });
+
+        // Fallback: Try without secureCookie if failed (sanity check)
+        if (!token && isProduction) {
+            console.log('[DOWNLOAD_DEBUG] Retrying without secureCookie...');
+            token = await getToken({
+                req: request,
+                secret: process.env.AUTH_SECRET,
+                secureCookie: false
+            });
+            console.log('[DOWNLOAD_DEBUG] Retry result:', { hasToken: !!token });
+        }
+
         if (!token?.email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const [user] = await db.select().from(users).where(eq(users.email, token.email));

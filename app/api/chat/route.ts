@@ -29,9 +29,9 @@ export async function POST(req: NextRequest) {
 
         const groq = new Groq({ apiKey: GROQ_API_KEY });
 
-        // Truncate context if necessary (Llama 3.3 has huge context, but let's be safe for speed)
-        // 20k chars is plenty for most contracts
-        const safeContext = context ? context.substring(0, 30000) : "No contract context provided.";
+        // Truncate context to avoid 413 Payload Too Large or TPM limits
+        // Reduced from 30k to 12k characters (~3k tokens)
+        const safeContext = context ? context.substring(0, 12000) : "No contract context provided.";
 
         const systemPrompt = `
         Você é um assistente jurídico especializado em contratos (ContractMind AI).
