@@ -9,7 +9,8 @@ import Groq from 'groq-sdk';
 // CONFIGURATION
 // ==========================================
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
-const AI_ENABLED = process.env.AI_ENABLED === 'true';
+// Check both standard and public env vars to be robust
+const AI_ENABLED = process.env.AI_ENABLED === 'true' || process.env.NEXT_PUBLIC_AI_ENABLED === 'true';
 // Default model updated to prevent "Decommissioned" error if env is missing
 const AI_MODEL = process.env.AI_MODEL || 'llama-3.3-70b-versatile';
 
