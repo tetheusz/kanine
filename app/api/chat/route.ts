@@ -30,8 +30,8 @@ export async function POST(req: NextRequest) {
         const groq = new Groq({ apiKey: GROQ_API_KEY });
 
         // Truncate context to avoid 413 Payload Too Large or TPM limits
-        // Reduced from 30k to 12k characters (~3k tokens)
-        const safeContext = context ? context.substring(0, 12000) : "No contract context provided.";
+        // Reduced to 6000 characters (~1.5k tokens) to be extremely safe
+        const safeContext = context ? context.substring(0, 6000) : "No contract context provided.";
 
         const systemPrompt = `
         Você é um assistente jurídico especializado em contratos (ContractMind AI).
