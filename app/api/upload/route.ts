@@ -9,7 +9,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request: NextRequest) {
     try {
-        const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+        const token = await getToken({
+            req: request,
+            secret: process.env.AUTH_SECRET,
+            secureCookie: process.env.NODE_ENV === 'production'
+        });
 
         if (!token?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

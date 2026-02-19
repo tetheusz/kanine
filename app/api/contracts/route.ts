@@ -7,7 +7,11 @@ import { desc, eq, and } from 'drizzle-orm';
 // GET /api/contracts - List contracts for user's company
 export async function GET(req: NextRequest) {
     try {
-        const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+        const token = await getToken({
+            req,
+            secret: process.env.AUTH_SECRET,
+            secureCookie: process.env.NODE_ENV === 'production'
+        });
 
         if (!token?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -46,7 +50,11 @@ export async function GET(req: NextRequest) {
 // POST /api/contracts - Create a new contract
 export async function POST(request: NextRequest) {
     try {
-        const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+        const token = await getToken({
+            req: request,
+            secret: process.env.AUTH_SECRET,
+            secureCookie: process.env.NODE_ENV === 'production'
+        });
 
         if (!token?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
