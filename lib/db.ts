@@ -1,8 +1,8 @@
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
 import { drizzle as drizzleNeon } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import * as dotenv from 'dotenv';
+import * as schemaSqlite from '../drizzle/schema';
+import * as schemaPg from '../drizzle/schema.pg';
 
 dotenv.config();
 
@@ -13,29 +13,15 @@ let sqlite: any;
 const isNeon = !!process.env.DATABASE_URL;
 
 if (isNeon) {
-  const client = neon(process.env.DATABASE_URL!);
-  // Dynamic import to avoid bundling issues? No, standard import is fine if we use require or just import all
-  // But schema types differ.
-  // For Drizzle ORM, we need to pass the schema object. 
-  // We'll import * as schemaPg from '../drizzle/schema.pg';
-  // We'll import * as schemaSqlite from '../drizzle/schema';
-
-  // Since we are module based, we can't conditionally import easily at top level in ES6 without await.
-  // However, top-level await is supported in Next.js Server Components / API routes, but might be tricky in lib/db.ts
-  // Let's rely on standard imports and just pick the right one.
-}
-
-// We need to import both schemas to pick one
-import * as schemaSqlite from '../drizzle/schema';
-import * as schemaPg from '../drizzle/schema.pg';
-
-if (isNeon) {
   const connectionString = process.env.DATABASE_URL!;
   const sslUrl = connectionString.includes('sslmode') ? connectionString : `${connectionString}?sslmode=require`;
   const client = neon(sslUrl);
   db = drizzleNeon(client, { schema: schemaPg });
 } else {
-  // Local SQLite fallback
+  // Local SQLite fallback - Lazy load to avoid Vercel Serverless crashes
+  const Database = require('better-sqlite3');
+  const { drizzle } = require('drizzle-orm/better-sqlite3');
+
   sqlite = new Database('contractmind.db');
   db = drizzle(sqlite, { schema: schemaSqlite });
 }

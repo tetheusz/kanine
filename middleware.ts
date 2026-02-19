@@ -20,9 +20,19 @@ export async function middleware(request: NextRequest) {
     }
 
     // Check JWT token (edge-compatible, no fs dependency)
-    const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+    const token = await getToken({
+        req: request,
+        secret: process.env.AUTH_SECRET,
+        secureCookie: process.env.NODE_ENV === 'production'
+    });
 
-    console.log(`[MW] Path: ${pathname}, Token: ${token ? 'FOUND' : 'MISSING'}`);
+    console.log('[MW] Debug:', {
+        path: pathname,
+        hasToken: !!token,
+        cookieNames: request.cookies.getAll().map(c => c.name),
+        isProduction: process.env.NODE_ENV === 'production',
+        url: request.url
+    });
 
     if (!token) {
         console.log('[MW] Redirecting to login');
