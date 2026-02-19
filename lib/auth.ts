@@ -14,6 +14,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 password: { label: 'Senha', type: 'password' },
             },
             async authorize(credentials) {
+                console.log('[AUTH] Init info:', {
+                    hasSecret: !!process.env.AUTH_SECRET,
+                    secretStart: process.env.AUTH_SECRET?.substring(0, 3),
+                    url: process.env.NEXTAUTH_URL,
+                    nodeEnv: process.env.NODE_ENV
+                });
                 console.log('[AUTH] Starting authorization for:', credentials?.email);
 
                 if (!credentials?.email || !credentials?.password) {
@@ -73,6 +79,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     callbacks: {
         async jwt({ token, user }) {
+            console.log('[AUTH_CB] JWT Callback', { hasUser: !!user, tokenId: token?.id });
             if (user) {
                 token.id = user.id as string;
                 token.companyId = user.companyId as unknown as number;
@@ -81,6 +88,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return token;
         },
         async session({ session, token }) {
+            console.log('[AUTH_CB] Session Callback', { hasToken: !!token, userId: token?.id });
             if (session.user) {
                 session.user.id = token.id as string;
                 session.user.companyId = token.companyId as number;

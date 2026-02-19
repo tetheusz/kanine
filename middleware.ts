@@ -22,7 +22,10 @@ export async function middleware(request: NextRequest) {
     // Check JWT token (edge-compatible, no fs dependency)
     const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
 
+    console.log(`[MW] Path: ${pathname}, Token: ${token ? 'FOUND' : 'MISSING'}`);
+
     if (!token) {
+        console.log('[MW] Redirecting to login');
         const loginUrl = new URL('/login', request.url);
         loginUrl.searchParams.set('callbackUrl', pathname);
         return NextResponse.redirect(loginUrl);
