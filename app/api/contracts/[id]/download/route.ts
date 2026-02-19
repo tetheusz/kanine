@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { contracts, users } from '@/drizzle/schema';
 import { eq, and } from 'drizzle-orm';
-import { getToken } from 'next-auth/jwt';
+import { auth } from '@/lib/auth';
 import { getDownloadUrl } from '@/lib/storage';
 
 export async function GET(
@@ -10,35 +10,13 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const isProduction = process.env.NODE_ENV === 'production';
-        console.log('[DOWNLOAD_DEBUG] Init', {
-            id: (await params).id,
-            isProduction,
-            hasSecret: !!process.env.AUTH_SECRET
-        });
+        const session = await auth();
 
-        let token = await getToken({
-            req: request,
-            secret: process.env.AUTH_SECRET,
-            secureCookie: isProduction
-        });
-
-        console.log('[DOWNLOAD_DEBUG] Token result:', { hasToken: !!token });
-
-        // Fallback: Try without secureCookie if failed (sanity check)
-        if (!token && isProduction) {
-            console.log('[DOWNLOAD_DEBUG] Retrying without secureCookie...');
-            token = await getToken({
-                req: request,
-                secret: process.env.AUTH_SECRET,
-                secureCookie: false
-            });
-            console.log('[DOWNLOAD_DEBUG] Retry result:', { hasToken: !!token });
+        if (!session?.user?.email) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        if (!token?.email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-        const [user] = await db.select().from(users).where(eq(users.email, token.email));
+        const [user] = await db.select().from(users).where(eq(users.email, session.user.email));
         if (!user || !user.companyId) {
             return NextResponse.json({ error: 'User not associated with a company' }, { status: 403 });
         }
