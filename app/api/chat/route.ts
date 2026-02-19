@@ -1,4 +1,6 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
+import Groq from 'groq-sdk';
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 // Use the same model as the extraction engine for consistency
