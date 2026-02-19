@@ -1,13 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
-import Groq from 'groq-sdk';
+import { getToken } from 'next-auth/jwt';
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 // Use the same model as the extraction engine for consistency
 const AI_MODEL = process.env.AI_MODEL || 'llama-3.3-70b-versatile';
 
 export async function POST(req: NextRequest) {
+    const token = await getToken({
+        req,
+        secret: process.env.AUTH_SECRET,
+        secureCookie: process.env.NODE_ENV === 'production'
+    });
+
+    if (!token) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     if (!GROQ_API_KEY) {
-        return NextResponse.json({ error: 'Groq API Key not configured' }, { status: 500 });
+        console.error('Groq API Key missing in environment variables');
+        return NextResponse.json({ error: 'System configuration error (API Key)' }, { status: 500 });
     }
 
     try {

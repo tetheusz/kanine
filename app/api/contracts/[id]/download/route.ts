@@ -10,7 +10,11 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+        const token = await getToken({
+            req: request,
+            secret: process.env.AUTH_SECRET,
+            secureCookie: process.env.NODE_ENV === 'production'
+        });
         if (!token?.email) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const [user] = await db.select().from(users).where(eq(users.email, token.email));
