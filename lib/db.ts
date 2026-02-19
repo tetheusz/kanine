@@ -30,7 +30,9 @@ import * as schemaSqlite from '../drizzle/schema';
 import * as schemaPg from '../drizzle/schema.pg';
 
 if (isNeon) {
-  const client = neon(process.env.DATABASE_URL!);
+  const connectionString = process.env.DATABASE_URL!;
+  const sslUrl = connectionString.includes('sslmode') ? connectionString : `${connectionString}?sslmode=require`;
+  const client = neon(sslUrl);
   db = drizzleNeon(client, { schema: schemaPg });
 } else {
   // Local SQLite fallback
