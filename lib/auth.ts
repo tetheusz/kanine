@@ -14,36 +14,56 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 password: { label: 'Senha', type: 'password' },
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) return null;
+                console.log('[AUTH] Starting authorization for:', credentials?.email);
+
+                if (!credentials?.email || !credentials?.password) {
+                    console.log('[AUTH] Missing credentials');
+                    return null;
+                }
 
                 const email = credentials.email as string;
                 const password = credentials.password as string;
 
-                const [user] = await db
-                    .select({
-                        id: users.id,
-                        name: users.name,
-                        email: users.email,
-                        passwordHash: users.passwordHash,
-                        companyId: users.companyId,
-                        companyName: companies.name,
-                    })
-                    .from(users)
-                    .leftJoin(companies, eq(users.companyId, companies.id))
-                    .where(eq(users.email, email));
+                try {
+                    console.log('[AUTH] Querying DB for user...');
+                    const [user] = await db
+                        .select({
+                            id: users.id,
+                            name: users.name,
+                            email: users.email,
+                            passwordHash: users.passwordHash,
+                            companyId: users.companyId,
+                            companyName: companies.name,
+                        })
+                        .from(users)
+                        .leftJoin(companies, eq(users.companyId, companies.id))
+                        .where(eq(users.email, email));
 
-                if (!user) return null;
+                    if (!user) {
+                        console.log('[AUTH] User not found in DB');
+                        return null;
+                    }
 
-                const isValid = await bcrypt.compare(password, user.passwordHash);
-                if (!isValid) return null;
+                    console.log('[AUTH] User found, verifying password...');
+                    const isValid = await bcrypt.compare(password, user.passwordHash);
 
-                return {
-                    id: String(user.id),
-                    name: user.name,
-                    email: user.email,
-                    companyId: user.companyId,
-                    companyName: user.companyName,
-                };
+                    if (!isValid) {
+                        console.log('[AUTH] Invalid password');
+                        return null;
+                    }
+
+                    console.log('[AUTH] Login successful for user:', user.id);
+                    return {
+                        id: String(user.id),
+                        name: user.name,
+                        email: user.email,
+                        companyId: user.companyId,
+                        companyName: user.companyName,
+                    };
+                } catch (error) {
+                    console.error('[AUTH] Error during authorization:', error);
+                    return null;
+                }
             },
         }),
     ],
