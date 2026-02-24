@@ -2,7 +2,8 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { db } from '@/lib/db';
-import { users, companies } from '@/drizzle/schema';
+import { companies } from '@/drizzle/schema';
+import { users } from '@/drizzle/schema.pg';
 import { eq } from 'drizzle-orm';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -38,6 +39,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             name: users.name,
                             email: users.email,
                             passwordHash: users.passwordHash,
+                            role: users.role,
                             companyId: users.companyId,
                             companyName: companies.name,
                         })
@@ -63,6 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         id: String(user.id),
                         name: user.name,
                         email: user.email,
+                        role: user.role || 'user',
                         companyId: user.companyId,
                         companyName: user.companyName,
                     };
@@ -82,6 +85,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             console.log('[AUTH_CB] JWT Callback', { hasUser: !!user, tokenId: token?.id });
             if (user) {
                 token.id = user.id as string;
+                token.role = (user as any).role || 'user';
                 token.companyId = user.companyId as unknown as number;
                 token.companyName = user.companyName as unknown as string;
             }
@@ -91,6 +95,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             console.log('[AUTH_CB] Session Callback', { hasToken: !!token, userId: token?.id });
             if (session.user) {
                 session.user.id = token.id as string;
+                session.user.role = token.role as string;
                 session.user.companyId = token.companyId as number;
                 session.user.companyName = token.companyName as string;
             }

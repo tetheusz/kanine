@@ -1,4 +1,4 @@
-import { Navigation } from '@/components/navigation';
+import { Sidebar } from '@/components/sidebar';
 
 export default function AppLayout({
     children,
@@ -6,9 +6,11 @@ export default function AppLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className="min-h-screen bg-slate-50">
-            <Navigation />
-            <main className="container mx-auto px-4 py-8">{children}</main>
+        <div className="flex min-h-screen bg-slate-50">
+            <Sidebar />
+            <main className="flex-1 overflow-auto">
+                <div className="container mx-auto px-6 py-8">{children}</div>
+            </main>
         </div>
     );
 }

@@ -30,6 +30,10 @@ export async function GET() {
                 },
                 contratos: { count: countContratos.rows[0]?.count },
                 companies: { count: countCompanies.rows[0]?.count }
+            },
+            details: {
+                companies: await db.execute(sql`SELECT id, name FROM companies`).then((r: any) => r.rows),
+                users: await db.execute(sql`SELECT id, name, email, company_id, role FROM users`).then((r: any) => r.rows),
             }
         });
     } catch (error) {

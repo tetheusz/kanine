@@ -13,9 +13,10 @@ export async function middleware(request: NextRequest) {
     const isCheckLatest = pathname.startsWith('/api/check-latest'); // TEMP FIX
     const isDebugDb = pathname.startsWith('/api/debug-db');
     const isFixSchema = pathname.startsWith('/api/fix-schema');
+    const isResetPw = pathname.startsWith('/api/reset-password'); // TEMP
     const isStaticAsset = pathname.startsWith('/_next') || pathname.includes('.');
 
-    if (isPublic || isApiAuth || isApiRegister || isCheckLatest || isDebugDb || isFixSchema || isStaticAsset) {
+    if (isPublic || isApiAuth || isApiRegister || isCheckLatest || isDebugDb || isFixSchema || isResetPw || isStaticAsset) {
         return NextResponse.next();
     }
 

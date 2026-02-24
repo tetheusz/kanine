@@ -42,9 +42,25 @@ export const companies = isPostgres ? schemaPg.companies : companiesSqlite;
 export const contracts = isPostgres ? schemaPg.contracts : contractsSqlite;
 export const users = isPostgres ? schemaPg.users : usersSqlite;
 
+// New module tables (PostgreSQL only — no SQLite fallback needed)
+export const categories = schemaPg.categories;
+export const transactions = schemaPg.transactions;
+export const bankAccounts = schemaPg.bankAccounts;
+export const budgets = schemaPg.budgets;
+export const budgetRevisions = schemaPg.budgetRevisions;
+export const pettyCash = schemaPg.pettyCash;
+export const pettyCashFund = schemaPg.pettyCashFund;
+export const chatMessages = schemaPg.chatMessages;
+export const bills = schemaPg.bills;
+export const notifications = schemaPg.notifications;
+export const approvals = schemaPg.approvals;
+
+// Type exports
 export type Contract = typeof contracts.$inferSelect;
 export type NewContract = typeof contracts.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Company = typeof companies.$inferSelect;
 export type NewCompany = typeof companies.$inferInsert;
+export type { Category, NewCategory, Transaction, NewTransaction, BankAccount, NewBankAccount, Budget, NewBudget, BudgetRevision, PettyCashEntry, NewPettyCashEntry, PettyCashFundEntry, ChatMessage, NewChatMessage, Bill, NewBill, Notification, NewNotification, Approval, NewApproval } from './schema.pg';
+

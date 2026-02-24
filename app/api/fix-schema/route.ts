@@ -41,13 +41,45 @@ export async function GET() {
             log(`INFO: Could not add texto_bruto: ${e.message}`);
         }
 
-        // 5. Verify
+        // 5. Fix orphaned company references
+        try {
+            const orphans = await db.execute(sql`
+                SELECT DISTINCT u.company_id 
+                FROM users u 
+                LEFT JOIN companies c ON u.company_id = c.id 
+                WHERE u.company_id IS NOT NULL AND c.id IS NULL
+            `);
+            if (orphans.rows.length > 0) {
+                for (const row of orphans.rows) {
+                    const cid = (row as any).company_id;
+                    await db.execute(sql`
+                        INSERT INTO companies (id, name, plan, created_at)
+                        VALUES (${cid}, ${'Minha Empresa'}, ${'free'}, ${new Date().toISOString()})
+                        ON CONFLICT (id) DO NOTHING
+                    `);
+                    log(`FIXED: Created missing company id=${cid}`);
+                }
+                // Reset sequence to avoid future conflicts
+                await db.execute(sql`SELECT setval('companies_id_seq', (SELECT MAX(id) FROM companies))`);
+                log('FIXED: Reset companies_id_seq');
+            } else {
+                log('OK: No orphaned company references');
+            }
+        } catch (e: any) {
+            log(`WARN: Company fix: ${e.message}`);
+        }
+
+        // 6. Verify
         const after = await db.execute(sql`
             SELECT column_name, data_type 
             FROM information_schema.columns 
             WHERE table_name = 'contratos';
         `);
         log(`Columns after: ${after.rows.map((r: any) => r.column_name).join(', ')}`);
+
+        // 7. Show companies for verification
+        const companiesList = await db.execute(sql`SELECT id, name FROM companies`);
+        log(`Companies: ${JSON.stringify(companiesList.rows)}`);
 
         return NextResponse.json({ success: true, logs });
     } catch (error) {
