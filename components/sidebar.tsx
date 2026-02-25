@@ -132,13 +132,13 @@ export function Sidebar() {
                                             }
                                         }}
                                         className={cn(
-                                            'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+                                            'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
                                             active
-                                                ? 'bg-slate-900 text-white shadow-sm'
-                                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                                ? 'bg-slate-100 text-slate-900 shadow-sm'
+                                                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
                                         )}
                                     >
-                                        <span className="text-base shrink-0">{mod.icon}</span>
+                                        <span className={cn("text-base shrink-0", active ? "text-primary" : "")}>{mod.icon}</span>
                                         {!collapsed && (
                                             <>
                                                 <span className="flex-1">{mod.label}</span>

@@ -1,386 +1,634 @@
+"use client";
+
 import Link from 'next/link';
-import { DM_Serif_Display } from 'next/font/google';
-import { K9Logo, KanineBrand } from '@/components/k9-logo';
+import { K9Logo } from '@/components/k9-logo';
+import { motion, useInView } from 'framer-motion';
+import { useRef, useState } from 'react';
+import {
+  ArrowRight, ShieldCheck, Zap, Activity, Search, FileText,
+  Bell, CheckCircle2, BarChart3, Clock, Users, ChevronDown,
+  Star, TrendingUp, Lock, Eye, AlertTriangle, Plus
+} from 'lucide-react';
 
-const serif = DM_Serif_Display({ weight: '400', subsets: ['latin'] });
+/* ─────────────────── helpers ─────────────────── */
+function Section({ children, className = '', id }: { children: React.ReactNode; className?: string; id?: string }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  return (
+    <motion.section
+      ref={ref}
+      id={id}
+      initial={{ opacity: 0, y: 40 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.7, ease: 'easeOut' }}
+      className={className}
+    >
+      {children}
+    </motion.section>
+  );
+}
 
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-slate-100 last:border-0">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between py-5 text-left group"
+      >
+        <span className="font-medium text-slate-900 text-[15px] pr-8">{q}</span>
+        <ChevronDown className={`w-5 h-5 text-slate-400 shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      <div className={`overflow-hidden transition-all duration-300 ${open ? 'max-h-40 pb-5' : 'max-h-0'}`}>
+        <p className="text-sm text-slate-500 leading-relaxed">{a}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────── data ─────────────────── */
+const features = [
+  {
+    icon: <ShieldCheck className="w-5 h-5" />,
+    title: 'Auditoria Automatizada',
+    desc: 'Cada contrato é analisado por IA que identifica cláusulas de risco, inconsistências e oportunidades de melhoria.',
+  },
+  {
+    icon: <Bell className="w-5 h-5" />,
+    title: 'Alertas Inteligentes',
+    desc: 'Notificações automáticas sobre vencimentos, obrigações pendentes e mudanças regulatórias.',
+  },
+  {
+    icon: <BarChart3 className="w-5 h-5" />,
+    title: 'Dashboards em Tempo Real',
+    desc: 'Visão consolidada do portfólio de contratos com métricas de risco, valor e performance.',
+  },
+  {
+    icon: <Lock className="w-5 h-5" />,
+    title: 'Compliance Integrado',
+    desc: 'Verificações automáticas de conformidade com normas regulatórias e políticas internas da empresa.',
+  },
+  {
+    icon: <Users className="w-5 h-5" />,
+    title: 'Fluxo de Aprovações',
+    desc: 'Workflows multi-nível para revisão e aprovação de contratos com rastreabilidade completa.',
+  },
+  {
+    icon: <TrendingUp className="w-5 h-5" />,
+    title: 'Contas a Pagar e Receber',
+    desc: 'Controle financeiro integrado com visão de fluxo de caixa vinculado a obrigações contratuais.',
+  },
+];
+
+const testimonials = [
+  {
+    name: 'Rafael Mendes',
+    role: 'Diretor Jurídico, Nexus Corp',
+    text: 'Reduzimos em 40% o tempo de revisão de contratos. A auditoria automatizada identificou riscos que nosso time não havia percebido.',
+    rating: 5,
+  },
+  {
+    name: 'Carolina Vieira',
+    role: 'CFO, Grupo Atria',
+    text: 'A visibilidade financeira que o Kanine trouxe para nosso portfólio de contratos mudou completamente nossa gestão de riscos.',
+    rating: 5,
+  },
+  {
+    name: 'Pedro Albuquerque',
+    role: 'Head de Operações, DataFlow',
+    text: 'Integração simples, resultados imediatos. Temos controle total sobre prazos e obrigações desde o primeiro mês.',
+    rating: 5,
+  },
+];
+
+const faqs = [
+  { q: 'Existe um período de teste gratuito?', a: 'Sim, oferecemos 14 dias de teste gratuito com acesso completo a todas as funcionalidades. Não é necessário cartão de crédito.' },
+  { q: 'Como funciona a auditoria por IA?', a: 'Nosso motor de IA analisa cada cláusula do contrato buscando riscos, inconsistências e oportunidades. O processo leva em média 30 segundos por documento.' },
+  { q: 'Posso integrar com meu ERP?', a: 'Sim, oferecemos integrações via API REST com os principais ERPs do mercado como SAP, TOTVS e Oracle.' },
+  { q: 'Meus dados estão seguros?', a: 'Todos os dados são criptografados em repouso e em trânsito. Seguimos os padrões SOC 2 Type II e LGPD.' },
+  { q: 'Quantos contratos posso gerenciar?', a: 'Não há limite de contratos em nenhum dos planos. A cobrança é baseada no número de usuários da plataforma.' },
+];
+
+/* ─────────────────── page ─────────────────── */
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#FAFAF8] selection:bg-amber-200 selection:text-amber-900">
-      {/* ═══════════════ NAV ═══════════════ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#FAFAF8]/90 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 md:px-10">
-          <div className="flex items-center justify-between h-20 border-b border-stone-900/5">
-            <Link href="/" className="flex items-center gap-2 text-stone-900">
-              <KanineBrand />
+    <div className="bg-white text-slate-800 min-h-screen selection:bg-blue-50 selection:text-blue-900 antialiased">
+
+      {/* ═══════════ NAV ═══════════ */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="flex items-center gap-2.5">
+              <K9Logo className="w-7 h-7" />
+              <span className="text-lg font-bold tracking-tight text-slate-900">Kanine</span>
             </Link>
 
-            <div className="hidden md:flex items-center gap-8 text-[13px] tracking-wide text-stone-500">
-              <a href="#features" className="hover:text-stone-900 transition-colors duration-300">Recursos</a>
-              <a href="#how" className="hover:text-stone-900 transition-colors duration-300">Metodologia</a>
-              <a href="#testimonials" className="hover:text-stone-900 transition-colors duration-300">Casos de Uso</a>
+            <div className="hidden md:flex items-center gap-8 text-[13px] font-medium text-slate-500">
+              <a href="#funcionalidades" className="hover:text-slate-900 transition-colors">Funcionalidades</a>
+              <a href="#produto" className="hover:text-slate-900 transition-colors">Produto</a>
+              <a href="#depoimentos" className="hover:text-slate-900 transition-colors">Depoimentos</a>
+              <a href="#faq" className="hover:text-slate-900 transition-colors">FAQ</a>
             </div>
 
-            <div className="flex items-center gap-5">
-              <Link href="/login" className="text-[13px] text-stone-600 hover:text-stone-900 transition-colors duration-300">
+            <div className="flex items-center gap-3">
+              <Link href="/login" className="text-[13px] font-medium text-slate-600 hover:text-slate-900 transition-colors px-4 py-2">
                 Entrar
               </Link>
               <Link
                 href="/register"
-                className="text-[13px] font-semibold text-white bg-stone-900 px-5 py-2.5 rounded-lg hover:bg-stone-800 transition-all duration-300 hover:shadow-lg hover:shadow-stone-900/20"
+                className="px-5 py-2 bg-slate-900 text-white text-[13px] font-medium rounded-lg hover:bg-slate-800 transition-colors"
               >
-                Iniciar Análise
+                Começar agora
               </Link>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* ═══════════════ HERO ═══════════════ */}
-      <section className="relative pt-36 pb-28 md:pt-44 md:pb-36 overflow-hidden">
-        {/* Ambient light */}
-        <div className="absolute top-0 left-1/4 w-[700px] h-[500px] bg-amber-100/20 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] bg-orange-50/30 rounded-full blur-[100px] pointer-events-none" />
-
-        <div className="relative max-w-7xl mx-auto px-6 md:px-10">
-          {/* Badge */}
-          <div className="mb-10">
-            <span className="inline-flex items-center gap-3 text-[12px] tracking-widest uppercase text-stone-500 font-medium">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                Auditoria Ativa
-              </span>
-              <span className="text-stone-300">—</span>
-              Inteligência K9
-            </span>
-          </div>
-
-          {/* Headline */}
-          <div className="max-w-5xl">
-            <h1 className={`${serif.className} text-[clamp(2.8rem,7vw,5.5rem)] leading-[1.02] tracking-tight text-stone-900`}>
-              Detecção precisa de<br />
-              riscos contratuais<br />
-              <span className="text-amber-500">em segundos.</span>
-            </h1>
-          </div>
-
-          {/* Sub + CTA */}
-          <div className="mt-12 flex flex-col md:flex-row md:items-end md:justify-between gap-10">
-            <p className="text-stone-500 text-lg leading-relaxed max-w-md">
-              Upload do PDF. O motor K9 analisa cláusulas, valida dados e identifica riscos ocultos.
-              Auditoria completa com precisão investigativa.
-            </p>
-
-            <div className="flex items-center gap-4 shrink-0">
-              <Link
-                href="/register"
-                className="group inline-flex items-center gap-3 px-7 py-4 bg-stone-900 text-white text-sm font-semibold rounded-lg transition-all duration-300 hover:shadow-xl hover:shadow-stone-900/15 hover:-translate-y-px"
+      {/* ═══════════ HERO ═══════════ */}
+      <section className="pt-32 pb-12 md:pt-40 md:pb-16 px-6">
+        <div className="max-w-6xl mx-auto">
+          {/* Hero content: left-aligned like TrustPay / Humify */}
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-md mb-6"
               >
-                Começar Agora
-                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-              <a
-                href="#how"
-                className="text-sm text-stone-500 hover:text-stone-900 transition-colors duration-300 underline underline-offset-4 decoration-stone-300 hover:decoration-stone-900"
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                <span className="text-xs font-medium text-emerald-700">Plataforma de Gestão de Contratos</span>
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.08 }}
+                className="text-[clamp(2.2rem,4.5vw,3.6rem)] font-bold text-slate-900 leading-[1.15] tracking-tight"
               >
-                Ver demonstração
-              </a>
+                Controle total dos seus contratos em um único lugar
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.16 }}
+                className="text-base text-slate-500 mt-5 leading-relaxed max-w-lg"
+              >
+                Gerencie, audite e monitore automaticamente contratos e obrigações financeiras.
+                Reduza riscos e ganhe eficiência com inteligência artificial.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.24 }}
+                className="flex items-center gap-3 mt-8"
+              >
+                <Link
+                  href="/register"
+                  className="px-6 py-3 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors"
+                >
+                  Começar gratuitamente
+                </Link>
+                <Link
+                  href="#produto"
+                  className="px-6 py-3 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  Ver demonstração
+                </Link>
+              </motion.div>
+
+              {/* Stats row */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="flex items-center gap-8 mt-12 pt-8 border-t border-slate-100"
+              >
+                <div>
+                  <div className="text-2xl font-bold text-slate-900">2.400+</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Contratos auditados</div>
+                </div>
+                <div className="w-px h-10 bg-slate-100" />
+                <div>
+                  <div className="text-2xl font-bold text-slate-900">98%</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Satisfação dos clientes</div>
+                </div>
+                <div className="w-px h-10 bg-slate-100" />
+                <div>
+                  <div className="text-2xl font-bold text-slate-900">40%</div>
+                  <div className="text-xs text-slate-500 mt-0.5">Redução de riscos</div>
+                </div>
+              </motion.div>
             </div>
-          </div>
 
-          {/* ── Hero visual: Dashboard mockup ── */}
-          <div className="mt-20 relative">
-            <div className="bg-white rounded-2xl border border-stone-200/80 shadow-[0_8px_60px_-12px_rgba(0,0,0,0.08)] overflow-hidden">
-              {/* Browser bar */}
-              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-stone-100 bg-stone-50/80">
-                <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-stone-300" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-stone-300" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-stone-300" />
+            {/* Right: floating UI card preview */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="relative hidden md:block"
+            >
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 p-5">
+                {/* Mini Header */}
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-2">
+                    <K9Logo className="w-5 h-5" />
+                    <span className="text-sm font-bold text-slate-900">Painel Geral</span>
+                  </div>
+                  <div className="text-[11px] text-slate-400">Última att: 11:20 AM</div>
                 </div>
-                <div className="ml-4 flex-1 max-w-xs h-6 rounded-md bg-stone-100 flex items-center px-3">
-                  <span className="text-[10px] text-stone-400">kanine.app/dashboard</span>
-                </div>
-              </div>
 
-              {/* Dashboard content */}
-              <div className="p-6 md:p-10 space-y-6">
-                {/* Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {/* Metrics row */}
+                <div className="grid grid-cols-3 gap-3 mb-5">
+                  <div className="bg-slate-50 rounded-xl p-3">
+                    <div className="text-[11px] text-slate-500">Ativos</div>
+                    <div className="text-xl font-bold text-slate-900 mt-1">147</div>
+                    <div className="text-[10px] text-emerald-600 mt-1 font-medium">↑ 12%</div>
+                  </div>
+                  <div className="bg-slate-50 rounded-xl p-3">
+                    <div className="text-[11px] text-slate-500">Vencendo</div>
+                    <div className="text-xl font-bold text-amber-600 mt-1">23</div>
+                    <div className="text-[10px] text-amber-600 mt-1 font-medium">próx. 30 dias</div>
+                  </div>
+                  <div className="bg-slate-50 rounded-xl p-3">
+                    <div className="text-[11px] text-slate-500">Risco</div>
+                    <div className="text-xl font-bold text-slate-900 mt-1">92<span className="text-sm text-slate-400">/100</span></div>
+                    <div className="text-[10px] text-emerald-600 mt-1 font-medium">Saudável</div>
+                  </div>
+                </div>
+
+                {/* Contracts list */}
+                <div className="space-y-2">
                   {[
-                    { label: 'Analisados', value: '47', color: 'text-stone-900', icon: '🔍' },
-                    { label: 'Conformes', value: '32', color: 'text-emerald-600', icon: '✓' },
-                    { label: 'Atenção', value: '8', color: 'text-amber-600', icon: '⚠' },
-                    { label: 'Críticos', value: '7', color: 'text-red-500', icon: '✕' },
-                  ].map((stat) => (
-                    <div key={stat.label} className="bg-stone-50/80 rounded-xl p-4 border border-stone-100">
-                      <div className="flex items-center justify-between">
-                        <p className="text-[11px] text-stone-400 uppercase tracking-wider font-medium">{stat.label}</p>
-                        <span className="text-xs opacity-50">{stat.icon}</span>
-                      </div>
-                      <p className={`text-2xl font-bold ${stat.color} mt-1`}>{stat.value}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Contract rows */}
-                <div className="space-y-3">
-                  {[
-                    { name: 'Acordo de Prestação — Silva & Martins', value: 'R$ 142.500,00', status: 'Conforme', statusColor: 'bg-emerald-100 text-emerald-700' },
-                    { name: 'NDA Confidencialidade — Tech Corp', value: 'Cláusula 5.3 divergente', status: 'Atenção', statusColor: 'bg-amber-100 text-amber-700' },
-                    { name: 'Locação Comercial — Av. Paulista 1200', value: 'R$ 18.000,00/mês', status: 'Conforme', statusColor: 'bg-emerald-100 text-emerald-700' },
-                  ].map((c) => (
-                    <div key={c.name} className="flex items-center justify-between p-4 rounded-xl bg-stone-50/50 border border-stone-100 hover:border-stone-200 transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className="w-9 h-9 rounded-lg bg-stone-200/60 flex items-center justify-center">
-                          <svg className="w-4 h-4 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                          </svg>
+                    { name: 'NDA – Tech Corp', type: 'Confidencialidade', status: 'Vigente', statusColor: 'text-emerald-700 bg-emerald-50' },
+                    { name: 'Locação Sala 04', type: 'Imobiliário', status: 'Vencendo', statusColor: 'text-amber-700 bg-amber-50' },
+                    { name: 'SLA AWS Cloud', type: 'Serviços', status: 'Vigente', statusColor: 'text-emerald-700 bg-emerald-50' },
+                    { name: 'Contrato PRJ-042', type: 'Consultoria', status: 'Em revisão', statusColor: 'text-blue-700 bg-blue-50' },
+                  ].map((c, i) => (
+                    <div key={i} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-slate-50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-slate-100 rounded-md flex items-center justify-center">
+                          <FileText className="w-4 h-4 text-slate-400" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-stone-800">{c.name}</p>
-                          <p className="text-xs text-stone-400 mt-0.5">{c.value}</p>
+                          <div className="text-[13px] font-medium text-slate-900">{c.name}</div>
+                          <div className="text-[11px] text-slate-400">{c.type}</div>
                         </div>
                       </div>
-                      <span className={`text-[11px] font-semibold px-3 py-1 rounded-full ${c.statusColor}`}>
+                      <span className={`text-[11px] font-medium px-2 py-0.5 rounded-md ${c.statusColor}`}>
                         {c.status}
                       </span>
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
 
-            {/* Floating K9 chat card */}
-            <div className="absolute -bottom-8 -right-4 md:right-8 w-72 bg-white rounded-xl border border-stone-200 shadow-[0_12px_40px_-8px_rgba(0,0,0,0.1)] p-5 animate-float hidden md:block">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-full bg-stone-900 flex items-center justify-center relative overflow-hidden">
-                  <K9Logo className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-stone-800">Assistente K9</p>
-                  <p className="text-[10px] text-stone-400">analisando contrato NDA...</p>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="bg-stone-50 rounded-lg px-3 py-2 text-[12px] text-stone-600">
-                  Há riscos na rescisão?
-                </div>
-                <div className="bg-amber-50 rounded-lg px-3 py-2 text-[12px] text-amber-800 border border-amber-100">
-                  <span className="font-semibold">Alerta:</span> A cláusula 5.3 permite rescisão unilateral sem justa causa. Risco moderado.
+                {/* Risk bar */}
+                <div className="mt-4 p-3 bg-slate-50 rounded-xl">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[11px] font-medium text-slate-700">Saúde do Portfólio</span>
+                    <span className="text-[11px] text-slate-400">Mensal</span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden flex">
+                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: '72%' }} />
+                    <div className="h-full bg-amber-400" style={{ width: '18%' }} />
+                    <div className="h-full bg-red-400 rounded-r-full" style={{ width: '10%' }} />
+                  </div>
+                  <div className="flex justify-between mt-1.5">
+                    <span className="text-[10px] text-slate-400">Conforme 72%</span>
+                    <span className="text-[10px] text-slate-400">Atenção 18%</span>
+                    <span className="text-[10px] text-slate-400">Crítico 10%</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Floating alert */}
-            <div className="absolute -top-4 -left-4 md:left-8 bg-white rounded-xl border border-stone-200 shadow-[0_8px_30px_-6px_rgba(0,0,0,0.08)] px-4 py-3 flex items-center gap-3 animate-float-delayed hidden md:flex">
-              <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-              <p className="text-[12px] text-stone-600">
-                K9 detectou <span className="font-semibold text-amber-600">3 pontos de atenção</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════ FEATURES ═══════════════ */}
-      <section id="features" className="py-28 md:py-36 bg-stone-900 text-white relative overflow-hidden">
-        {/* Grain */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")' }} />
-
-        <div className="relative max-w-7xl mx-auto px-6 md:px-10">
-          <div className="max-w-lg mb-20">
-            <span className="text-[12px] tracking-widest uppercase text-amber-400 font-medium">Capacidades</span>
-            <h2 className={`${serif.className} text-4xl md:text-5xl mt-4 leading-tight`}>
-              Auditoria automatizada<br />com precisão.
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-px bg-white/10 rounded-2xl overflow-hidden">
-            {[
-              {
-                number: '01',
-                title: 'Extração Estruturada',
-                desc: 'O motor K9 processa PDFs e extrai metadados críticos: partes, valores, datas e vigência com alta fidelidade.',
-                accent: 'text-amber-400',
-              },
-              {
-                number: '02',
-                title: 'Análise de Risco',
-                desc: 'Monitoramento contínuo de cláusulas abusivas, prazos exíguos e obrigações desproporcionais.',
-                accent: 'text-red-400',
-              },
-              {
-                number: '03',
-                title: 'Busca Semântica',
-                desc: 'Questions & Answers contextual. Localize informações específicas instantaneamente através de linguagem natural.',
-                accent: 'text-emerald-400',
-              },
-            ].map((f) => (
-              <div key={f.number} className="bg-stone-900 p-8 md:p-10 group hover:bg-stone-800/80 transition-colors duration-500">
-                <span className={`text-[11px] font-mono tracking-wider ${f.accent}`}>{f.number}</span>
-                <h3 className="text-xl font-semibold mt-4 mb-3">{f.title}</h3>
-                <p className="text-stone-400 text-sm leading-relaxed">{f.desc}</p>
-                <div className={`w-8 h-px ${f.accent.replace('text-', 'bg-')} mt-6 group-hover:w-16 transition-all duration-500`} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════ HOW IT WORKS ═══════════════ */}
-      <section id="how" className="py-28 md:py-36">
-        <div className="max-w-7xl mx-auto px-6 md:px-10">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-20">
-            <div>
-              <span className="text-[12px] tracking-widest uppercase text-amber-600 font-medium">Fluxo de Trabalho</span>
-              <h2 className={`${serif.className} text-4xl md:text-5xl text-stone-900 mt-4`}>
-                Simples. Rápido.<br />Eficaz.
-              </h2>
-            </div>
-            <Link
-              href="/register"
-              className="text-sm text-stone-500 hover:text-stone-900 transition-colors underline underline-offset-4 decoration-stone-300 hover:decoration-stone-900 self-start md:self-auto"
-            >
-              Começar agora →
-            </Link>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 md:gap-12">
-            {[
-              {
-                step: '01',
-                title: 'Upload Seguro',
-                desc: 'Envie seus contratos em PDF. Processamento criptografado e seguro.',
-                line: true,
-              },
-              {
-                step: '02',
-                title: 'Processamento K9',
-                desc: 'A IA analisa o documento, estruturando dados e identificando pontos de atenção.',
-                line: true,
-              },
-              {
-                step: '03',
-                title: 'Gestão Inteligente',
-                desc: 'Acesse insights, gerencie vencimentos e consulte o assistente virtual.',
-                line: false,
-              },
-            ].map((item) => (
-              <div key={item.step} className="relative">
-                <div className="flex items-center gap-4 mb-6">
-                  <span className="text-5xl font-bold text-stone-200/80 font-mono">{item.step}</span>
-                  {item.line && (
-                    <div className="hidden md:block flex-1 h-px bg-stone-200 ml-2" />
-                  )}
-                </div>
-                <h3 className="text-lg font-semibold text-stone-900 mb-2">{item.title}</h3>
-                <p className="text-stone-500 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════ TESTIMONIALS ═══════════════ */}
-      <section id="testimonials" className="py-28 md:py-36 bg-stone-50 border-y border-stone-200/60">
-        <div className="max-w-7xl mx-auto px-6 md:px-10">
-          <div className="max-w-lg mb-20">
-            <span className="text-[12px] tracking-widest uppercase text-amber-600 font-medium">Feedback</span>
-            <h2 className={`${serif.className} text-4xl md:text-5xl text-stone-900 mt-4`}>
-              Resultados reais.
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                quote: 'A precisão na detecção de cláusulas complexas superou nossas expectativas. Ferramenta essencial para due diligence.',
-                name: 'Roberto Silva',
-                role: 'Sócio Diretor',
-                company: 'Silva & Associados',
-                initials: 'RS',
-                bg: 'bg-amber-50',
-                initialsBg: 'bg-amber-600',
-              },
-              {
-                quote: 'Reduzimos o tempo de revisão em 70%. O assistente responde perguntas específicas com base no contrato instantaneamente.',
-                name: 'Mariana Costa',
-                role: 'Jurídico Interno',
-                company: 'Tech Corp',
-                initials: 'MC',
-                bg: 'bg-stone-100',
-                initialsBg: 'bg-stone-700',
-              },
-              {
-                quote: 'O monitoramento de vencimentos e renovações automáticas eliminou completamente nossos riscos de perda de prazo.',
-                name: 'Fernando Lima',
-                role: 'Gerente de Contratos',
-                company: 'Grupo Mattos',
-                initials: 'FL',
-                bg: 'bg-red-50',
-                initialsBg: 'bg-red-600',
-              },
-            ].map((t) => (
-              <div key={t.name} className={`${t.bg} rounded-2xl p-8 border border-stone-200/40`}>
-                <p className="text-stone-700 text-sm leading-relaxed mb-8">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className={`w-9 h-9 rounded-full ${t.initialsBg} flex items-center justify-center text-white text-xs font-bold`}>
-                    {t.initials}
+              {/* Floating alert card - offset for depth */}
+              <div className="absolute -bottom-6 -left-6 bg-white rounded-xl border border-slate-200 shadow-lg shadow-slate-200/50 p-3 w-60">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 bg-amber-50 rounded-md flex items-center justify-center shrink-0 mt-0.5">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-stone-900">{t.name}</p>
-                    <p className="text-[11px] text-stone-500">{t.role}, {t.company}</p>
+                    <div className="text-[12px] font-medium text-slate-900">Contrato vencendo</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">Locação Sala 04 vence em 12 dias</div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Logos bar */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.8 }}
+            className="mt-20 pt-8 border-t border-slate-100"
+          >
+            <p className="text-xs text-slate-400 text-center mb-6 font-medium uppercase tracking-wider">Confiado por mais de 500 empresas</p>
+            <div className="flex items-center justify-center gap-10 md:gap-16 opacity-40 grayscale flex-wrap">
+              <span className="text-lg font-bold tracking-tight text-slate-900">TOTVS</span>
+              <span className="text-lg font-bold tracking-tight text-slate-900">Bradesco</span>
+              <span className="text-lg font-bold tracking-tight text-slate-900">Vivo</span>
+              <span className="text-lg font-bold tracking-tight text-slate-900">Ambev</span>
+              <span className="text-lg font-bold tracking-tight text-slate-900">BTG</span>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════ FEATURES ═══════════ */}
+      <Section id="funcionalidades" className="py-20 md:py-28 px-6 bg-slate-50/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="max-w-xl mb-14">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Funcionalidades</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mt-3 tracking-tight leading-tight">
+              Tudo que você precisa para gestão de contratos
+            </h2>
+            <p className="text-slate-500 mt-4 text-[15px] leading-relaxed">
+              Da análise ao monitoramento contínuo.
+              Cada funcionalidade foi projetada para eliminar trabalho manual e reduzir riscos.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {features.map((f, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-xl border border-slate-100 p-6 hover:border-slate-200 hover:shadow-sm transition-all group"
+              >
+                <div className="w-9 h-9 bg-slate-900 rounded-lg flex items-center justify-center text-white mb-4 group-hover:bg-slate-800 transition-colors">
+                  {f.icon}
+                </div>
+                <h3 className="font-semibold text-slate-900 text-[15px]">{f.title}</h3>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ═══════════ PRODUCT SHOWCASE ═══════════ */}
+      <Section id="produto" className="py-20 md:py-28 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14 max-w-2xl mx-auto">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Produto</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mt-3 tracking-tight">
+              Gestão inteligente começa aqui
+            </h2>
+            <p className="text-slate-500 mt-4 text-[15px] leading-relaxed">
+              Interface projetada para decisões rápidas. Todas as informações que importam em uma visão consolidada.
+            </p>
+          </div>
+
+          {/* Product screenshot mockup */}
+          <div className="bg-slate-50 rounded-2xl border border-slate-100 p-3 md:p-4">
+            <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
+              {/* Browser chrome */}
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100 bg-slate-50/50">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-200" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-200" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-200" />
+                </div>
+                <div className="flex-1 flex justify-center">
+                  <div className="bg-white border border-slate-200 rounded-md px-4 py-1 text-[11px] text-slate-400 w-80 text-center">
+                    app.kanine.com.br/dashboard
+                  </div>
+                </div>
+              </div>
+
+              {/* App content */}
+              <div className="flex min-h-[420px]">
+                {/* Sidebar */}
+                <div className="w-52 border-r border-slate-100 p-4 hidden md:flex flex-col">
+                  <div className="flex items-center gap-2 mb-8">
+                    <K9Logo className="w-5 h-5" />
+                    <span className="text-sm font-bold text-slate-900">Kanine</span>
+                  </div>
+
+                  <div className="space-y-0.5 text-[13px]">
+                    <div className="flex items-center gap-2.5 px-3 py-2 bg-slate-100 text-slate-900 rounded-lg font-medium">
+                      <Activity className="w-4 h-4" /> Dashboard
+                    </div>
+                    <div className="flex items-center gap-2.5 px-3 py-2 text-slate-500 rounded-lg">
+                      <FileText className="w-4 h-4" /> Contratos
+                    </div>
+                    <div className="flex items-center gap-2.5 px-3 py-2 text-slate-500 rounded-lg">
+                      <Bell className="w-4 h-4" /> Notificações
+                    </div>
+                    <div className="flex items-center gap-2.5 px-3 py-2 text-slate-500 rounded-lg">
+                      <CheckCircle2 className="w-4 h-4" /> Aprovações
+                    </div>
+                    <div className="flex items-center gap-2.5 px-3 py-2 text-slate-500 rounded-lg">
+                      <BarChart3 className="w-4 h-4" /> Financeiro
+                    </div>
+                  </div>
+                </div>
+
+                {/* Main content */}
+                <div className="flex-1 p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <div className="text-lg font-bold text-slate-900">Painel de Controle</div>
+                      <div className="text-[12px] text-slate-400 mt-0.5">Visão consolidada do portfólio</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="px-3 py-1.5 border border-slate-200 rounded-lg text-[12px] text-slate-500">
+                        Fev 2026
+                      </div>
+                      <div className="px-3 py-1.5 bg-slate-900 text-white rounded-lg text-[12px] font-medium flex items-center gap-1">
+                        <Plus className="w-3 h-3" /> Novo
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Metrics */}
+                  <div className="grid grid-cols-4 gap-3 mb-6">
+                    {[
+                      { label: 'Total', value: '312', sub: 'contratos' },
+                      { label: 'Ativos', value: '287', sub: '+8 este mês', subColor: 'text-emerald-600' },
+                      { label: 'Vencendo', value: '18', sub: 'em 30 dias', subColor: 'text-amber-600' },
+                      { label: 'Valor total', value: 'R$ 4.2M', sub: '+12% vs anterior', subColor: 'text-emerald-600' },
+                    ].map((m, i) => (
+                      <div key={i} className="bg-slate-50 rounded-lg p-3">
+                        <div className="text-[11px] text-slate-400">{m.label}</div>
+                        <div className="text-lg font-bold text-slate-900 mt-1">{m.value}</div>
+                        <div className={`text-[10px] mt-0.5 ${m.subColor || 'text-slate-400'}`}>{m.sub}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Chart placeholder + list */}
+                  <div className="grid grid-cols-5 gap-4">
+                    <div className="col-span-3 bg-slate-50 rounded-lg p-4">
+                      <div className="text-[12px] font-medium text-slate-700 mb-3">Volume (6 meses)</div>
+                      {/* Simple bar chart representation */}
+                      <div className="flex items-end gap-2 h-24">
+                        {[45, 62, 38, 75, 58, 82].map((h, i) => (
+                          <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                            <div
+                              className={`w-full rounded-sm ${i === 5 ? 'bg-slate-900' : 'bg-slate-200'}`}
+                              style={{ height: `${h}%` }}
+                            />
+                            <span className="text-[9px] text-slate-400">
+                              {['Set', 'Out', 'Nov', 'Dez', 'Jan', 'Fev'][i]}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="col-span-2 bg-slate-50 rounded-lg p-4">
+                      <div className="text-[12px] font-medium text-slate-700 mb-3">Recentes</div>
+                      <div className="space-y-2.5">
+                        {[
+                          { name: 'NDA Tech Corp', time: '2h atrás' },
+                          { name: 'Locação Sala 04', time: '5h atrás' },
+                          { name: 'SLA Cloud', time: '1d atrás' },
+                        ].map((r, i) => (
+                          <div key={i} className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 bg-white rounded border border-slate-200 flex items-center justify-center">
+                                <FileText className="w-3 h-3 text-slate-400" />
+                              </div>
+                              <span className="text-[11px] text-slate-700 font-medium">{r.name}</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400">{r.time}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* ═══════════ TESTIMONIALS ═══════════ */}
+      <Section id="depoimentos" className="py-20 md:py-28 px-6 bg-slate-50/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14 max-w-2xl mx-auto">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Depoimentos</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mt-3 tracking-tight">
+              O que nossos clientes dizem
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {testimonials.map((t, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-xl border border-slate-100 p-6"
+              >
+                <div className="flex gap-0.5 mb-4">
+                  {Array.from({ length: t.rating }).map((_, j) => (
+                    <Star key={j} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed mb-6">&ldquo;{t.text}&rdquo;</p>
+                <div className="flex items-center gap-3 pt-4 border-t border-slate-50">
+                  <div className="w-9 h-9 bg-slate-100 rounded-full flex items-center justify-center text-sm font-bold text-slate-600">
+                    {t.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-slate-900">{t.name}</div>
+                    <div className="text-[12px] text-slate-400">{t.role}</div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </Section>
 
-      {/* ═══════════════ CTA ═══════════════ */}
-      <section className="py-28 md:py-36">
-        <div className="max-w-3xl mx-auto px-6 md:px-10 text-center">
-          <div className="relative w-20 h-20 mx-auto mb-8">
-            <K9Logo className="w-20 h-20" />
+      {/* ═══════════ FAQ ═══════════ */}
+      <Section id="faq" className="py-20 md:py-28 px-6">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">FAQ</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mt-3 tracking-tight">
+              Perguntas frequentes
+            </h2>
           </div>
-          <h2 className={`${serif.className} text-4xl md:text-[3.5rem] text-stone-900 leading-tight`}>
-            Segurança e precisão<br />para seus contratos.
+
+          <div className="bg-white rounded-xl border border-slate-100 px-6">
+            {faqs.map((f, i) => (
+              <FaqItem key={i} q={f.q} a={f.a} />
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ═══════════ CTA ═══════════ */}
+      <Section className="py-20 md:py-28 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+            Pronto para transformar sua gestão de contratos?
           </h2>
-          <p className="text-stone-500 text-lg mt-6 mb-12 max-w-md mx-auto">
-            Inicie sua conta gratuita hoje. Sem cartão de crédito.
+          <p className="text-slate-500 mt-4 max-w-lg mx-auto text-[15px] leading-relaxed">
+            Comece gratuitamente em minutos. Sem cartão de crédito, sem compromisso.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-3 mt-8">
             <Link
               href="/register"
-              className="group inline-flex items-center gap-3 px-8 py-4 bg-stone-900 text-white text-sm font-semibold rounded-lg transition-all duration-300 hover:shadow-xl hover:shadow-stone-900/15 hover:-translate-y-px"
+              className="px-8 py-3.5 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors inline-flex items-center gap-2"
             >
-              Criar Conta Gratuita
-              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-            <Link href="/login" className="text-sm text-stone-500 hover:text-stone-900 transition-colors">
-              Já tenho conta
+              Começar agora <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
-      </section>
+      </Section>
 
-      {/* ═══════════════ FOOTER ═══════════════ */}
-      <footer className="border-t border-stone-200/60 py-10">
-        <div className="max-w-7xl mx-auto px-6 md:px-10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-stone-800">
-            <KanineBrand size="small" />
+      {/* ═══════════ FOOTER ═══════════ */}
+      <footer className="border-t border-slate-100 py-12 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-10">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <K9Logo className="w-6 h-6" />
+                <span className="text-sm font-bold text-slate-900">Kanine</span>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Plataforma de gestão e auditoria inteligente de contratos.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-4">Produto</h4>
+              <div className="space-y-2.5">
+                <a href="#funcionalidades" className="block text-sm text-slate-500 hover:text-slate-900 transition-colors">Funcionalidades</a>
+                <a href="#produto" className="block text-sm text-slate-500 hover:text-slate-900 transition-colors">Demonstração</a>
+                <a href="#" className="block text-sm text-slate-500 hover:text-slate-900 transition-colors">Preços</a>
+                <a href="#" className="block text-sm text-slate-500 hover:text-slate-900 transition-colors">Integrações</a>
+              </div>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-4">Empresa</h4>
+              <div className="space-y-2.5">
+                <a href="#" className="block text-sm text-slate-500 hover:text-slate-900 transition-colors">Sobre</a>
+                <a href="#" className="block text-sm text-slate-500 hover:text-slate-900 transition-colors">Blog</a>
+                <a href="#" className="block text-sm text-slate-500 hover:text-slate-900 transition-colors">Carreiras</a>
+                <a href="#" className="block text-sm text-slate-500 hover:text-slate-900 transition-colors">Contato</a>
+              </div>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-4">Legal</h4>
+              <div className="space-y-2.5">
+                <a href="#" className="block text-sm text-slate-500 hover:text-slate-900 transition-colors">Privacidade</a>
+                <a href="#" className="block text-sm text-slate-500 hover:text-slate-900 transition-colors">Termos de uso</a>
+                <a href="#" className="block text-sm text-slate-500 hover:text-slate-900 transition-colors">LGPD</a>
+              </div>
+            </div>
           </div>
-          <p className="text-[12px] text-stone-400">
-            © {new Date().getFullYear()} Kanine. Auditoria Inteligente de Contratos.
-          </p>
+          <div className="mt-12 pt-8 border-t border-slate-100 flex items-center justify-between">
+            <p className="text-xs text-slate-400">&copy; 2026 Kanine. Todos os direitos reservados.</p>
+            <div className="flex items-center gap-4">
+              <a href="#" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">LinkedIn</a>
+              <a href="#" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">Twitter</a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

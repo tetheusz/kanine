@@ -134,17 +134,17 @@ export default function DashboardPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-serif font-bold text-slate-900 tracking-tight">Painel de Controle</h1>
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Painel de Controle</h1>
                     <div className="flex items-center gap-2 mt-1">
                         <p className="text-slate-500">Visão estratégica dos contratos</p>
                         {session?.user?.companyName && (
-                            <Badge variant="outline" className="text-amber-700 bg-amber-50 border-amber-200 shadow-sm font-medium">
+                            <Badge variant="outline" className="text-slate-700 bg-slate-50 border-slate-200 shadow-sm font-medium rounded-full px-3 py-0.5">
                                 🏢 {session.user.companyName}
                             </Badge>
                         )}
                     </div>
                 </div>
-                <Button onClick={() => router.push('/upload')} className="bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-200">
+                <Button onClick={() => router.push('/upload')} className="bg-primary hover:bg-primary/90 text-white shadow-sm rounded-full px-6">
                     + Novo Contrato
                 </Button>
             </div>
@@ -162,40 +162,40 @@ export default function DashboardPage() {
 
             {/* Metrics Grid (Bento) */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="border-l-4 border-l-slate-800 shadow-sm hover:shadow-md transition-all">
+                <Card className="rounded-2xl border-slate-100 shadow-sm hover:shadow-md transition-all">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500 uppercase tracking-wider">Total de Contratos</CardTitle>
+                        <CardTitle className="text-sm font-medium text-slate-500">Total de Contratos</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-3xl font-bold text-slate-900">{metrics.total}</div>
                         <p className="text-xs text-slate-400 mt-1">Base completa</p>
                     </CardContent>
                 </Card>
-                <Card className="border-l-4 border-l-emerald-500 shadow-sm hover:shadow-md transition-all">
+                <Card className="rounded-2xl border-slate-100 shadow-sm hover:shadow-md transition-all">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-emerald-600 uppercase tracking-wider">Ativos</CardTitle>
+                        <CardTitle className="text-sm font-medium text-slate-500">Ativos</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-emerald-700">{metrics.active}</div>
-                        <p className="text-xs text-emerald-600/80 mt-1">Em vigência</p>
+                        <div className="text-3xl font-bold text-emerald-600">{metrics.active}</div>
+                        <p className="text-xs text-emerald-600/70 mt-1">Em vigência</p>
                     </CardContent>
                 </Card>
-                <Card className="border-l-4 border-l-amber-500 shadow-sm hover:shadow-md transition-all">
+                <Card className="rounded-2xl border-slate-100 shadow-sm hover:shadow-md transition-all">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-amber-600 uppercase tracking-wider">Vencendo (30d)</CardTitle>
+                        <CardTitle className="text-sm font-medium text-slate-500">Vencendo (30d)</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-amber-700">{metrics.expiring}</div>
-                        <p className="text-xs text-amber-600/80 mt-1">Requer atenção</p>
+                        <div className="text-3xl font-bold text-amber-500">{metrics.expiring}</div>
+                        <p className="text-xs text-amber-600/70 mt-1">Requer atenção</p>
                     </CardContent>
                 </Card>
-                <Card className="border-l-4 border-l-red-500 shadow-sm hover:shadow-md transition-all">
+                <Card className="rounded-2xl border-slate-100 shadow-sm hover:shadow-md transition-all">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-red-600 uppercase tracking-wider">Vencidos</CardTitle>
+                        <CardTitle className="text-sm font-medium text-slate-500">Vencidos</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-red-700">{metrics.expired}</div>
-                        <p className="text-xs text-red-600/80 mt-1">Renovação pendente</p>
+                        <div className="text-3xl font-bold text-red-500">{metrics.expired}</div>
+                        <p className="text-xs text-red-600/70 mt-1">Renovação pendente</p>
                     </CardContent>
                 </Card>
             </div>
@@ -203,10 +203,10 @@ export default function DashboardPage() {
             {/* Charts Section */}
             {contracts.length > 0 && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <Card className="shadow-sm">
+                    <Card className="rounded-2xl border-slate-100 shadow-sm">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <PieIcon className="h-5 w-5 text-slate-500" />
+                            <CardTitle className="flex items-center gap-2 text-slate-800">
+                                <PieIcon className="h-5 w-5 text-primary" />
                                 Distribuição de Status
                             </CardTitle>
                             <CardDescription>Visão percentual da carteira</CardDescription>
@@ -215,10 +215,10 @@ export default function DashboardPage() {
                             <StatusDistributionChart contracts={contracts} />
                         </CardContent>
                     </Card>
-                    <Card className="shadow-sm">
+                    <Card className="rounded-2xl border-slate-100 shadow-sm">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <TrendingUp className="h-5 w-5 text-slate-500" />
+                            <CardTitle className="flex items-center gap-2 text-slate-800">
+                                <TrendingUp className="h-5 w-5 text-primary" />
                                 Volume Cadastrado (6 Meses)
                             </CardTitle>
                             <CardDescription>Valor total de contratos por mês de criação</CardDescription>
@@ -263,15 +263,10 @@ export default function DashboardPage() {
                         {filteredContracts.map((contract) => (
                             <Card
                                 key={contract.id}
-                                className="hover:shadow-lg transition-all border-slate-200 group relative overflow-hidden cursor-pointer"
+                                className="rounded-2xl border-slate-100 shadow-sm hover:shadow-md transition-all group cursor-pointer bg-white"
                                 onClick={() => router.push(`/contracts/${contract.id}`)}
                             >
-                                <div className={`absolute top-0 left-0 w-1 h-full 
-                                    ${contract.status === 'active' ? 'bg-emerald-500' :
-                                        contract.status === 'expiring' ? 'bg-amber-500' :
-                                            contract.status === 'expired' ? 'bg-red-500' : 'bg-slate-300'}`}
-                                />
-                                <CardContent className="pt-5 pl-7">
+                                <CardContent className="p-6">
                                     <div className="flex justify-between items-start mb-3 gap-2">
                                         <div className="min-w-0 flex-1">
                                             <h3 className="font-semibold text-slate-900 line-clamp-1 break-all" title={contract.filename}>
@@ -282,7 +277,7 @@ export default function DashboardPage() {
                                             </p>
                                         </div>
                                         <Badge
-                                            className="ml-auto shrink-0"
+                                            className="ml-auto shrink-0 font-medium tracking-wide rounded-full px-3 py-0.5"
                                             variant={
                                                 contract.status === 'active' ? 'default' :
                                                     contract.status === 'expiring' ? 'secondary' :
@@ -309,9 +304,9 @@ export default function DashboardPage() {
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-2 mt-auto pt-2 border-t border-slate-100" onClick={(e) => e.stopPropagation()}>
+                                    <div className="flex gap-2 mt-auto pt-4 border-t border-slate-50" onClick={(e) => e.stopPropagation()}>
                                         <Button
-                                            className="flex-1 bg-slate-900 hover:bg-slate-800 text-white"
+                                            className="flex-1 bg-slate-50 hover:bg-primary hover:text-white text-slate-700 shadow-none border border-slate-200 rounded-full transition-colors"
                                             size="sm"
                                             onClick={async () => {
                                                 setChatLoading(contract.id);
